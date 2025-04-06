@@ -1,2 +1,6 @@
-# cds-bug-8
-SAP Subscription to S/4 events
+# SAP S/4 Eventing
+
+
+
+## Steps to reproduce
+1. `cds init`
