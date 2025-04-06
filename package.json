@@ -5,6 +5,7 @@
   "repository": "<Add your repository here>",
   "license": "UNLICENSED",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@sap/cds": "^8",
     "express": "^4",
@@ -24,6 +25,7 @@
       "API_MAINTENANCEORDER": {
         "kind": "odata-v2",
         "model": "srv/external/API_MAINTENANCEORDER"
+      
       }
     }
   }
