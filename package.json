@@ -22,10 +22,23 @@
   },
   "cds": {
     "requires": {
+      "requires": {
+        "[hybrid]": {
+          "messaging": {
+            "kind": "enterprise-messaging-shared",
+            "format": "cloudevents",
+            "publishPrefix": "$namespace/ce/",
+            "subscribePrefix": "+/+/+/ce/"
+          }
+        }
+      },
       "API_MAINTENANCEORDER": {
         "kind": "odata-v2",
         "model": "srv/external/API_MAINTENANCEORDER"
-      
+      },
+      "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder": {
+        "kind": "odata",
+        "model": "srv/external/MAINTENANCEORDEREVENTS"
       }
     }
   }

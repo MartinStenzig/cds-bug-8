@@ -78,3 +78,43 @@
             ```
         3. Start CAP in hybrid mode `cds w --profile hybrid`
         4. Execute the GET request -> A list of work orders (if existing should) should be returned.
+4. Add the asynchronous API's to Workorder
+    1. Import the Async API
+         - Copy MAINTENANCEORDEREVENTS.json to ./test/importfiles
+        - Import with following command `cds import ./test/importfiles/MAINTENANCEORDEREVENTS.json --from asyncapi --as cds`
+    2. Create [./srv/meshexternal.cds](./srv/meshexternal.cds) based on cap docu section 'Add Missing Event Declarations' with content
+    ```cds
+        using {API_MAINTENANCEORDER as sync} from './external/API_MAINTENANCEORDER';
+        using from './external/MAINTENANCEORDEREVENTS';
+
+        extend service sync with {
+
+            @topic: 'sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.Approved.v1'
+            event sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.Approved.v1 {
+                MaintenanceOrder     : LargeString;
+                MaintenanceOrderType : LargeString;
+            };
+
+        }
+    ```
+    3. Add the following to the init() method in [./srv/sap.js](./srv/sap.js)
+    ```javascript
+        s4hana.on('sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.Approved.v1', async (req) => {
+                console.log('MaintenanceOrder.Approved event received')
+            })
+
+    ```
+    4. Add the following to requires branch in package.json
+    ```json
+    "requires": {
+        "[hybrid]": {
+          "messaging": {
+            "kind": "enterprise-messaging-shared",
+            "format": "cloudevents",
+            "publishPrefix": "$namespace/ce/",
+            "subscribePrefix": "+/+/+/ce/"
+          }
+        }
+      },
+    ```
+          

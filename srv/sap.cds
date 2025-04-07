@@ -1,6 +1,7 @@
-using {API_MAINTENANCEORDER as syncS4Workorder} from './external/API_MAINTENANCEORDER';
+using {API_MAINTENANCEORDER as s4} from './meshexternal.cds';
+
 
 @path: 'wos'
 service SapWorkorderService {
-  entity WorkOrders as projection on syncS4Workorder.MaintenanceOrder;
+  entity WorkOrders as projection on s4.MaintenanceOrder;
 }
