@@ -11,34 +11,55 @@
     "express": "^4",
     "@sap-cloud-sdk/connectivity": "^3",
     "@sap-cloud-sdk/http-client": "^3",
-    "@sap-cloud-sdk/resilience": "^3"
+    "@sap-cloud-sdk/resilience": "^3",
+    "@sap/xssec": "^4",
+    "@sap/xb-msg-amqp-v100": "^0"
   },
   "devDependencies": {
+    "@cap-js/cds-types": "^0.9.0",
     "@cap-js/sqlite": "^1",
-    "@cap-js/cds-types": "^0.9.0"
+    "@sap/cds-dk": "^8"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "cf:deploy": "mbt build --mtar cdsbug8 && cf deploy mta_archives/cdsbug8.mtar",
+    "cf:undeploy": "cf undeploy cdsbug8 --delete-services --delete-service-keys --delete-service-brokers"
   },
   "cds": {
     "requires": {
-      "requires": {
-        "[hybrid]": {
-          "messaging": {
-            "kind": "enterprise-messaging-shared",
-            "format": "cloudevents",
-            "publishPrefix": "$namespace/ce/",
-            "subscribePrefix": "+/+/+/ce/"
-          }
-        }
+      "log": {
+        "format": "plain"
       },
       "API_MAINTENANCEORDER": {
         "kind": "odata-v2",
-        "model": "srv/external/API_MAINTENANCEORDER"
+        "model": "srv/external/API_MAINTENANCEORDER",
+        "[production]": {
+          "credentials": {
+            "destination": "sapdemo21srvuser",
+            "path": "/sap/opu/odata/sap/API_MAINTENANCEORDER"
+          }
+        }
       },
       "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder": {
         "kind": "odata",
         "model": "srv/external/MAINTENANCEORDEREVENTS"
+      },
+      "[hybrid]": {
+        "auth": "xsuaa",
+        "messaging": {
+          "kind": "enterprise-messaging-shared",
+          "format": "cloudevents",
+          "subscribePrefix": "$namespace/ce/"
+        }
+      },
+      "[production]": {
+        "auth": "xsuaa",
+        "messaging": {
+          "kind": "enterprise-messaging",
+          "format": "cloudevents",
+          "publishPrefix": "$namespace/ce/",
+          "subscribePrefix": "$namespace/ce/"
+        }
       }
     }
   }

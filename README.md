@@ -117,4 +117,97 @@
         }
       },
     ```
-          
+5. Add MTA configuration
+    1. Execute `cds add enterprise-messaging-shared,mta,xsuaa --for hybrid`
+    2. Changed event mesh from new instance to existing one by changing...
+    ```yaml
+      - name: cds-bug-8-messaging
+        type: org.cloudfoundry.managed-service
+        parameters:
+            service: enterprise-messaging
+            service-plan: default
+            path: ./event-mesh.json
+    ```
+    to (your existing event mesh instance)
+    ```yaml
+    - name: demo21Events
+      type: org.cloudfoundry.existing-service
+      parameters:
+        service: enterprise-messaging
+        service-plan: default
+    ```
+    3. Add scripts to package json for deploy and undeploy
+    ```json
+    {
+       ...
+       "cf:deploy": "mbt build --mtar cdsbug8 && cf deploy mta_archives/cdsbug8.mtar",
+       "cf:undeploy": "cf undeploy cdsbug8 --delete-services --delete-service-keys --delete-service-brokers"
+       ...
+    }
+
+# Work Order Statuses (in CloudEvents Format)
+1. When a work order is first created and saved you get
+```json
+{
+  "event": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToInPlanning.v1",
+  "data": { "MaintenanceOrder": "4001164", "MaintenanceOrderType": "YBA1" },
+  "headers": {
+    "type": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToInPlanning.v1",
+    "specversion": "1.0",
+    "source": "/default/sap.s4.beh/S4HCLNT100",
+    "id": "0affd05e-e84b-1fe0-8594-82618cab4e3a",
+    "time": "2025-04-08T18:05:38Z",
+    "datacontenttype": "application/json"
+  }
+}
+```
+2. When a work order is set to 'Released'
+
+```json
+{
+  "event": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToInPreparation.v1",
+  "data": { "MaintenanceOrder": "4001164", "MaintenanceOrderType": "YBA1" },
+  "headers": {
+    "type": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToInPreparation.v1",
+    "specversion": "1.0",
+    "source": "/default/sap.s4.beh/S4HCLNT100",
+    "id": "0affd05e-e84b-1fe0-8594-838cf199ae3a",
+    "time": "2025-04-08T18:05:53Z",
+    "datacontenttype": "application/json"
+  }
+}
+```
+
+3. When a work order is set to 'TECO'
+
+```json
+{
+  "event": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToTechCompleted.v1",
+  "data": { "MaintenanceOrder": "4001164", "MaintenanceOrderType": "YBA1" },
+  "headers": {
+    "type": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.SetToTechCompleted.v1",
+    "specversion": "1.0",
+    "source": "/default/sap.s4.beh/S4HCLNT100",
+    "id": "0affd05e-e84b-1fe0-8594-84b064c0ae3a",
+    "time": "2025-04-08T18:06:09Z",
+    "datacontenttype": "application/json"
+  }
+}
+```
+
+
+3. When a work order is set to 'CLSD'
+```json
+MaintenanceOrder closed EventMessage {
+  "event": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.Closed.v1",
+  "data": { "MaintenanceOrder": "4001164", "MaintenanceOrderType": "YBA1" },
+  "headers": {
+    "type": "sap.s4.beh.maintenanceorder.v1.MaintenanceOrder.Closed.v1",
+    "specversion": "1.0",
+    "source": "/default/sap.s4.beh/S4HCLNT100",
+    "id": "0affd05e-e84b-1fe0-8594-85c3135dae3a",
+    "time": "2025-04-08T18:06:23Z",
+    "datacontenttype": "application/json"
+  }
+}
+```

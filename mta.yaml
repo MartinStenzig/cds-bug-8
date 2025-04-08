@@ -1,0 +1,51 @@
+_schema-version: 3.3.0
+ID: cdsbug8
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: cds-bug-8-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: cds-bug-8-destination
+      - name: cds-bug-8-auth
+      - name: demo21Events
+
+resources:
+  - name: cds-bug-8-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+ 
+  - name: cds-bug-8-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: cds-bug-8-${org}-${space}
+        tenant-mode: dedicated
+  - name: demo21Events
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service: enterprise-messaging
+      service-plan: default
