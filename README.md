@@ -50,16 +50,14 @@
         1. create a file: `.cdsrc-private.json`
             ```json
             {
-                "cds": {
-                    "requires": {
-                        "API_MAINTENANCEORDER": {
-                            "[hybrid]": {
-                                "credentials": {
-                                    "url": "https://[hostname and port of your sap system]",
-                                    "path": "/sap/opu/odata/sap/API_MAINTENANCEORDER",
-                                    "username": "[username]",
-                                    "password": "[password]"
-                                }
+                "requires": {
+                    "API_MAINTENANCEORDER": {
+                        "[hybrid]": {
+                            "credentials": {
+                                "url": "https://[hostname and port of your sap system]",
+                                "path": "/sap/opu/odata/sap/API_MAINTENANCEORDER",
+                                "username": "[username]",
+                                "password": "[password]"
                             }
                         }
                     }
